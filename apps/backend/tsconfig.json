@@ -20,6 +20,8 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "strictBindCallApply": true,
-    "noFallthroughCasesInSwitch": true
-  }
+    "noFallthroughCasesInSwitch": true,
+    "ignoreDeprecations": "5.0"
+  },
+  "exclude": ["node_modules", "dist", "src/database/migrations", "eslint.config.mjs", "*.config.js", "*.config.mjs"]
 }
