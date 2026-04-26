@@ -10,7 +10,13 @@ import {
 } from 'typeorm';
 import { WatchHistory } from '../../watch-history/entities/watch-history.entity';
 
-export type ContentType = 'movie' | 'series';
+export const ContentType = {
+  Movie: 'movie',
+  Series: 'series',
+  Live: 'live',
+} as const;
+
+export type ContentType = (typeof ContentType)[keyof typeof ContentType];
 
 @Entity('streaming_content')
 export class StreamingContent {
@@ -30,7 +36,7 @@ export class StreamingContent {
   videoUrl: string | null = null;
 
   @Index('idx_content_type')
-  @Check(`"content_type" IN ('movie', 'series')`)
+  @Check(`"content_type" IN ('movie', 'series', 'live')`)
   @Column({ type: 'varchar', name: 'content_type', nullable: true })
   contentType: ContentType | null = null;
 

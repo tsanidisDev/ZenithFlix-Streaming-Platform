@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -15,6 +16,7 @@ export class WatchHistory {
   declare id: number;
 
   @ManyToOne(() => User, (user) => user.watchHistory, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
   declare user: User;
 
   @Column({ name: 'user_id', nullable: true })
@@ -23,6 +25,7 @@ export class WatchHistory {
   @ManyToOne(() => StreamingContent, (content) => content.watchHistory, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'content_id' })
   declare content: StreamingContent;
 
   @Column({ name: 'content_id', nullable: true })
