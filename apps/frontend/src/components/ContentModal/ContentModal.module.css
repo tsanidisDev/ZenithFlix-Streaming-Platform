@@ -1,0 +1,206 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: oklch(0% 0 0 / 0.82);
+  z-index: var(--z-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 760px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: var(--shadow-modal);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-surface-raised) transparent;
+}
+
+.panel::-webkit-scrollbar {
+  width: 4px;
+}
+
+.panel::-webkit-scrollbar-thumb {
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+}
+
+.close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 1;
+  background: oklch(0% 0 0 / 0.65);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background var(--duration-base),
+    border-color var(--duration-base);
+  backdrop-filter: blur(4px);
+}
+
+.close:hover {
+  background: oklch(0% 0 0 / 0.88);
+  border-color: var(--color-text-muted);
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.poster {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--color-surface-raised);
+}
+
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.posterFallback {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    var(--color-surface) 0%,
+    var(--color-surface-raised) 100%
+  );
+  font-size: 4.5rem;
+  font-weight: var(--weight-black);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.info {
+  padding: var(--space-6) var(--space-8) var(--space-4);
+}
+
+.infoTitle {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-4);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+
+.year {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.rating {
+  color: var(--color-rating);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.genre {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+}
+
+.badge {
+  background: var(--color-accent);
+  color: oklch(10% 0 0);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.description {
+  color: var(--color-text-secondary);
+  line-height: var(--leading-normal);
+  font-size: var(--text-base);
+}
+
+.video {
+  padding: 0 var(--space-8) var(--space-8);
+}
+
+.videoPlayer {
+  width: 100%;
+  border-radius: var(--radius-md);
+  background: oklch(0% 0 0);
+  display: block;
+}
+
+.videoEmpty {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.videoEmpty span {
+  font-size: 2.5rem;
+  opacity: 0.35;
+}
+
+.videoEmpty p {
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 640px) {
+  .info {
+    padding: var(--space-5) var(--space-5) var(--space-3);
+  }
+
+  .video {
+    padding: 0 var(--space-5) var(--space-5);
+  }
+
+  .infoTitle {
+    font-size: var(--text-xl);
+  }
+}
