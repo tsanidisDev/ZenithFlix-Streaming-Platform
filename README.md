@@ -69,6 +69,8 @@ pnpm dev:frontend
 
 **pnpm workspaces over Nx/Turborepo** - no extra tooling needed for two apps. Easy to layer on Turborepo later if build caching becomes necessary.
 
+**oklch over hsl/hex for the design token system** - oklch is perceptually uniform: adjusting lightness actually tracks linearly, so hover states are predictable (`L + 6%` gives a consistent brightness bump). All colors defined once in `src/styles/theme.css` as CSS custom properties; components reference tokens only, never raw values. Chose a teal accent (`oklch(70% 0.22 190)`) with a cool near-black background (`oklch(9% 0.015 260)`) specifically to avoid any Netflix red association and demonstrate independent design thinking.
+
 ---
 
 ## Migration bugs - see [docs/migrations.md](docs/migrations.md)
