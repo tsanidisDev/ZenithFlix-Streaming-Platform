@@ -9,7 +9,7 @@
   "scripts": {
     "dev:backend": "pnpm --filter backend start:dev",
     "dev:frontend": "pnpm --filter frontend dev",
-    "dev": "pnpm run --parallel dev:backend dev:frontend",
+    "dev": "pnpm dev:backend & pnpm dev:frontend",
     "build:backend": "pnpm --filter backend build",
     "build:frontend": "pnpm --filter frontend build",
     "build": "pnpm run --sequential build:backend build:frontend",
