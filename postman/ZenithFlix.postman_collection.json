@@ -1,0 +1,179 @@
+{
+  "info": {
+    "name": "ZenithFlix API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Streaming Content",
+      "item": [
+        {
+          "name": "List content",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/streaming?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["streaming"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "contentType", "value": "movie", "disabled": true },
+                { "key": "genre", "value": "Drama", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get content by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/streaming/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["streaming", "1"]
+            }
+          }
+        },
+        {
+          "name": "Create content",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/streaming",
+              "host": ["{{baseUrl}}"],
+              "path": ["streaming"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"The Dark Knight\",\n  \"description\": \"Batman faces the Joker in Gotham City.\",\n  \"thumbnailUrl\": \"https://example.com/dark-knight.jpg\",\n  \"videoUrl\": \"https://example.com/dark-knight.mp4\",\n  \"contentType\": \"movie\",\n  \"year\": 2008,\n  \"genre\": [\"Action\", \"Crime\", \"Drama\"],\n  \"rating\": 9.0,\n  \"duration\": 152,\n  \"castMembers\": [\"Christian Bale\", \"Heath Ledger\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Create live content",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/streaming",
+              "host": ["{{baseUrl}}"],
+              "path": ["streaming"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Live Gaming Tournament\",\n  \"description\": \"Championship finals streamed live.\",\n  \"videoUrl\": \"https://stream.example.com/live/finals\",\n  \"contentType\": \"live\",\n  \"genre\": [\"Gaming\", \"Esports\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update content",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/streaming/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["streaming", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"The Dark Knight\",\n  \"rating\": 9.1\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete content",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/streaming/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["streaming", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Watch History",
+      "item": [
+        {
+          "name": "Get watch history for user",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/watch-history?userId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["watch-history"],
+              "query": [
+                { "key": "userId", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add to watch history",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/watch-history",
+              "host": ["{{baseUrl}}"],
+              "path": ["watch-history"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"contentId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Update watch progress",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/watch-history/1/progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["watch-history", "1", "progress"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"progress\": 47.5\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete watch history entry",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/watch-history/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["watch-history", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
