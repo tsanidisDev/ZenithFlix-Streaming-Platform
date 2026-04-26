@@ -1,6 +1,6 @@
 # ZenithFlix Streaming Platform
 
-Full-stack streaming platform - NestJS backend, Next.js 15 frontend, PostgreSQL.
+Full-stack streaming platform - NestJS backend, Next.js 16 frontend, PostgreSQL.
 
 ---
 
@@ -79,6 +79,5 @@ pnpm dev:frontend
 
 ## Assumptions
 
-- Auth is JWT with a mocked user context, no real sign-up/login flow yet.
 - Video playback uses the `video_url` field with an HTML5 `<video>` tag, no real CDN.
 - Watch history lives in `localStorage` for now; the DB table is there for a future sync.
