@@ -1,18 +1,17 @@
 # ZenithFlix Streaming Platform
 
-Full-stack streaming platform - NestJS backend, Next.js 16 frontend, PostgreSQL.
+Full-stack streaming platform — NestJS backend, Next.js 16 frontend, PostgreSQL.
 
 ---
 
 ## Project Structure
 
-`apps/backend` - NestJS REST API
-
-`apps/frontend` - Next.js 15 App Router
-
-`docs/` - per-area notes (backend, frontend, migrations, postman collections)
-
-`docker-compose.yml` - runs PostgreSQL locally
+```
+apps/backend/     NestJS REST API (auth, streaming CRUD, recommendations, watch history)
+apps/frontend/    Next.js 16 App Router (content browsing, auth, theming, search)
+docs/             Per-area notes (backend, frontend, migrations, Postman collection)
+docker-compose.yml  Runs PostgreSQL 16 locally
+```
 
 ---
 
@@ -26,60 +25,151 @@ Full-stack streaming platform - NestJS backend, Next.js 16 frontend, PostgreSQL.
 
 ## Setup
 
+### 1 — Clone and install
+
 ```bash
 git clone https://github.com/tsanidisDev/ZenithFlix-Streaming-Platform.git
 cd ZenithFlix-Streaming-Platform
 pnpm install
+```
+
+### 2 — Environment
+
+```bash
 cp .env.example .env
-# fill in your values in .env
-pnpm db:up
-pnpm dev:backend
-pnpm dev:frontend
+# Edit .env — required values:
+#   POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
+#   DATABASE_URL=postgres://<user>:<pass>@localhost:5432/<db>
+#   JWT_SECRET=<any-long-random-string>
+#   JWT_EXPIRES_IN=7d
+```
+
+### 3 — Database
+
+```bash
+pnpm db:up          # starts the PostgreSQL container
+# Wait a few seconds for the container to be ready, then:
+cd apps/backend && pnpm migration:run   # runs all TypeORM migrations
+pnpm db:seed                            # seeds 15 sample content items
+```
+
+### 4 — Run
+
+```bash
+# From the monorepo root:
+pnpm dev             # starts both apps in parallel
+# OR individually:
+pnpm dev:backend     # NestJS on http://localhost:3001
+pnpm dev:frontend    # Next.js on http://localhost:3000
 ```
 
 ---
 
-## Scripts
+## Available Scripts
 
-`pnpm dev` - start both apps in parallel
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start both apps in parallel |
+| `pnpm dev:backend` | NestJS in watch mode |
+| `pnpm dev:frontend` | Next.js with Turbopack |
+| `pnpm build` | Production build for both apps |
+| `pnpm test:backend` | Backend unit + integration tests |
+| `pnpm test:frontend` | Frontend component tests (Vitest + RTL) |
+| `pnpm db:up` | Start the PostgreSQL Docker container |
+| `pnpm db:down` | Stop the container |
+| `pnpm db:reset` | Wipe and restart the database |
+| `pnpm db:seed` | Seed 15 sample content items |
 
-`pnpm dev:backend` - NestJS in watch mode (`start:dev`)
+---
 
-`pnpm dev:frontend` - Next.js with Turbopack
+## Architectural Decisions
 
-`pnpm build` - production build for both apps
+### Backend
 
-`pnpm test:backend` - backend unit + integration tests
+- **NestJS** with layered structure (controllers / services / modules / DTOs / entities). Enables clean separation of concerns and makes dependency injection straightforward.
+- **TypeORM** with `synchronize: false` in all environments — migrations are the source of truth, never auto-sync.
+- **JWT** via `@nestjs/jwt` + `passport-jwt`. Secrets from env vars. Passwords hashed with bcrypt (cost factor 12). Write endpoints (`POST/PUT/DELETE /streaming`) require a valid Bearer token; read endpoints are public.
+- **class-validator** + **class-transformer** applied via global `ValidationPipe` with `whitelist: true` to strip unknown fields at the boundary.
+- **Recommendations** resolved with a single QueryBuilder call using Postgres `&&` (array overlap) on the `genre` column. N+1 queries were the original bug — see [docs/backend.md](docs/backend.md).
 
-`pnpm test:frontend` - frontend component tests
+### Frontend
 
-`pnpm db:up` - start the database container
-
-`pnpm db:down` - stop the database container
-
-`pnpm db:reset` - wipe and restart the database
+- **Next.js 16 App Router** — each route in `app/` is a Server Component shell that renders a client `"use client"` page for interactivity.
+- **`useContent` hook** — all data fetching in one place. Returns `{ items, loading, error }`. Only runs when `contentType` (a primitive) changes — avoids object-reference re-render traps.
+- **`AuthContext`** — JWT stored in `localStorage` (`zenithflix_token`). A single mount-only `useEffect` reads and decodes the token (SSR constraint — `localStorage` is browser-only). Login/logout mutate state and `localStorage` directly in the event handler.
+- **Anti-FOUC theming** — `/public/theme-init.js` is loaded via Next.js `<Script strategy="beforeInteractive">`. It runs before any React JS, reads `localStorage`, and sets `data-theme` on `<html>`. No flash on page load, no `dangerouslySetInnerHTML`.
+- **URL-scoped search** — the Header reads the current pathname via `usePathname()` and routes search to `${pathname}?q=…`. Each page reads `useSearchParams()` and filters locally. Search state never bleeds across routes.
 
 ---
 
 ## Key Decisions
 
-**TypeORM over Prisma** - fits better with NestJS decorators and lets you generate migrations straight from entities. Query API is less ergonomic than Prisma's but QueryBuilder covers the gaps.
+### 1. TypeORM over Prisma
 
-**CSS Modules over Tailwind** - styles live next to the component, zero runtime cost, full isolation. More verbose for responsive work but easier to maintain long term.
+**Chosen:** TypeORM  
+**Tradeoff:** TypeORM's entity-decorator pattern maps directly onto NestJS's DI system — `@InjectRepository()` works out of the box. Migrations are generated from entity diffs with a single CLI command. The downside is a less ergonomic query API for complex joins; `QueryBuilder` compensates but is more verbose than Prisma's fluent API. For a team already on NestJS, TypeORM's tighter integration outweighs Prisma's DX advantages.
 
-**pnpm workspaces over Nx/Turborepo** - no extra tooling needed for two apps. Easy to layer on Turborepo later if build caching becomes necessary.
+### 2. CSS Modules over Tailwind
 
-**oklch over hsl/hex for the design token system** - oklch is perceptually uniform: adjusting lightness actually tracks linearly, so hover states are predictable (`L + 6%` gives a consistent brightness bump). All colors defined once in `src/styles/theme.css` as CSS custom properties; components reference tokens only, never raw values. Chose a teal accent (`oklch(70% 0.22 190)`) with a cool near-black background (`oklch(9% 0.015 260)`) specifically to avoid any Netflix red association and demonstrate independent design thinking.
+**Chosen:** CSS Modules  
+**Tradeoff:** Styles live next to the component, zero runtime cost, full class-name isolation. The design token system (all values in `styles/theme.css` as CSS custom properties) means components only ever reference tokens — the palette can change without touching component files. The downside is verbosity: responsive styles and hover states require explicit rules. Tailwind's utility classes are faster to prototype with but leak implementation details into JSX and make large-scale token changes harder.
+
+### 3. oklch for the design token system
+
+**Chosen:** oklch colour space  
+**Tradeoff:** oklch is perceptually uniform — adjusting `L` by a fixed amount produces the same perceived brightness change regardless of hue. This makes hover states (`L + 6%`) and disabled states (`L − 15%`) predictable across the whole palette without manual colour tweaking. The cost is that oklch is not supported in IE11 (irrelevant here) and requires a mental model shift from the familiar hsl. Chose teal (`oklch(70% 0.22 190)`) on a near-black background (`oklch(9% 0.015 260)`) to demonstrate independent design thinking rather than copying a known brand palette.
+
+### 4. pnpm workspaces over Nx / Turborepo
+
+**Chosen:** pnpm workspaces  
+**Tradeoff:** No extra tooling for two apps — `pnpm dev` + `--filter` handles parallel dev and per-package scripts cleanly. Turborepo's build caching would pay off once the repo has 5+ packages with slow builds; at two apps it adds config overhead for minimal gain. The monorepo can be migrated to Turborepo non-destructively later.
+
+### 5. URL-scoped search via `useSearchParams` / `usePathname`
+
+**Chosen:** URL query param `?q=` per page  
+**Tradeoff:** Search state lives in the URL — shareable, bookmarkable, survives refresh, and Back/Forward work as expected. The alternative (shared React state in a Context) is simpler to implement but breaks navigation semantics and makes search results non-shareable. The URL approach requires `<Suspense>` wrappers around every page that reads `useSearchParams` (Next.js App Router requirement), which adds a small amount of boilerplate but is the correct architectural choice.
 
 ---
 
-## Migration bugs - see [docs/migrations.md](docs/migrations.md)
+## Migration Bug Fixes
 
-## Recommendations module bugs - see [docs/backend.md](docs/backend.md)
+Full details in [docs/migrations.md](docs/migrations.md).
+
+| # | Bug | Error | Fix |
+|---|-----|-------|-----|
+| 1 | `cast` is a reserved SQL keyword | `syntax error at or near "cast"` | Renamed column to `cast_members TEXT[]` |
+| 2 | `CREATE INDEX` on non-existent column `content_type` | `column "content_type" does not exist` | Added `content_type VARCHAR CHECK(...)` column to the table |
+| 3 | `watch_history.user_id` references `users(id)` but no `users` table exists | `relation "users" does not exist` | Added `CREATE TABLE users` before `watch_history` |
+| 4 | Trigger on `streaming_content` failed because Bug 1 prevented the table from being created | `relation "streaming_content" does not exist` | Resolved automatically once Bug 1 was fixed |
 
 ---
 
-## Assumptions
+## NestJS Module Bug Fixes
 
-- Video playback uses the `video_url` field with an HTML5 `<video>` tag, no real CDN.
-- Watch history lives in `localStorage` for now; the DB table is there for a future sync.
+Full details in [docs/backend.md](docs/backend.md).
+
+| # | Bug | Description | Fix |
+|---|-----|-------------|-----|
+| 1 | Wrong repository for user history | `getForUser` queried `StreamingContent` with `{ where: { userId } }` — `StreamingContent` has no `userId` | Injected `WatchHistoryRepository`, queried `watch_history WHERE user_id = ?` with content relation |
+| 2 | N+1 query | One `findOne` per history item inside a loop — 50 watched items = 50 DB round-trips | Collected all unique genres first, then one `QueryBuilder` call with `&&` array overlap |
+| 3 | Scalar equality on `TEXT[]` column | `findOne({ where: { genre: 'Drama' } })` generates `WHERE genre = $1` which never matches an array | Used Postgres `&&` operator: `content.genre && ARRAY[:...genres]` |
+| 4 | No null guard in `getSimilar` | `findOne` returns `null` for unknown IDs; accessing `.genre` throws | Added `NotFoundException` guard before property access |
+
+---
+
+## Postman Collection
+
+Import `docs/postman/ZenithFlix.postman_collection.json` into Postman.
+Swagger UI is also available at `http://localhost:3001/api/docs` when the backend is running.
+
+---
+
+## Assumptions & Known Limitations
+
+- **Video playback:** uses the `video_url` field with an HTML5 `<video>` tag. No real CDN or adaptive streaming (HLS/DASH). Production would use a signed URL pattern with a CDN edge layer.
+- **Watch history (Part 4):** the `useWatchHistory` hook and "Continue Watching" row are not yet implemented. The DB table and backend endpoints are in place. Frontend implementation is in progress.
+- **Frontend tests (Part 5):** Vitest + React Testing Library are not yet configured. Backend tests (Jest) are complete and passing.
+- **Forgot password:** button exists on the login page with a "not yet available" message. No reset flow or email service is implemented.
+- **Recommendations endpoint:** returns genre-overlap results from the DB. Frontend does not yet surface a recommendations row — data is available via API.
+- **Profile page:** renders a placeholder UI. No real user profile editing or avatar upload.
+- **Live TV:** renders a placeholder page. No real live stream URLs.
