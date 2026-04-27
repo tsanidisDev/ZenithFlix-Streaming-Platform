@@ -1,0 +1,95 @@
+.main {
+  min-height: calc(100dvh - var(--header-h));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) var(--space-4);
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: oklch(10% 0 0);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.email {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: 0;
+  word-break: break-all;
+}
+
+.sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+.homeBtn {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-align: center;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.homeBtn:hover {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.logoutBtn {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid oklch(62% 0.22 25 / 0.4);
+  background: transparent;
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+
+.logoutBtn:hover {
+  background: oklch(62% 0.22 25 / 0.1);
+}
+
+.logoutBtn:focus-visible {
+  outline: 2px solid var(--color-danger);
+  outline-offset: 2px;
+}
