@@ -26,7 +26,7 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(dto.password, 12);
     const user = await this.usersService.create(dto.email, passwordHash);
 
-    return { accessToken: this.sign(user.id, user.email) };
+    return { accessToken: this.sign(user.id, user.email, user.createdAt) };
   }
 
   async login(dto: LoginDto): Promise<{ accessToken: string }> {
@@ -40,11 +40,15 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return { accessToken: this.sign(user.id, user.email) };
+    return { accessToken: this.sign(user.id, user.email, user.createdAt) };
   }
 
-  private sign(userId: number, email: string): string {
-    const payload: JwtPayload = { sub: userId, email };
+  private sign(userId: number, email: string, createdAt: Date): string {
+    const payload: JwtPayload = {
+      sub: userId,
+      email,
+      createdAt: createdAt.toISOString(),
+    };
     return this.jwtService.sign(payload);
   }
 }

@@ -11,6 +11,7 @@ import {
 export interface AuthUser {
   sub: number;
   email: string;
+  createdAt?: string;
 }
 
 interface AuthContextValue {
@@ -32,8 +33,9 @@ function decodeJwt(token: string): AuthUser | null {
     const payload = JSON.parse(atob(token.split('.')[1])) as {
       sub: number;
       email: string;
+      createdAt?: string;
     };
-    return { sub: payload.sub, email: payload.email };
+    return { sub: payload.sub, email: payload.email, createdAt: payload.createdAt };
   } catch {
     return null;
   }
