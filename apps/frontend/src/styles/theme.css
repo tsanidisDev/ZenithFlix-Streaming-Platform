@@ -76,10 +76,67 @@
   --z-btn:      10;
   --z-backdrop: 100;
   --z-modal:    101;
+  --z-drawer:   200;
+
+  /* ── Extra shadows ───────────────────────── */
+  --shadow-menu: 0 8px 24px oklch(0% 0 0 / 0.5);
+}
+
+/* ── Light theme ─────────────────────────────── */
+[data-theme="light"] {
+  --color-bg:              oklch(97% 0.004 260);
+  --color-surface:         oklch(93% 0.006 260);
+  --color-surface-raised:  oklch(88% 0.008 260);
+
+  --color-accent:          oklch(52% 0.22 190);
+  --color-accent-hover:    oklch(46% 0.22 190);
+  --color-accent-glow:     oklch(52% 0.22 190 / 0.2);
+
+  --color-text:            oklch(12% 0.01 260);
+  --color-text-secondary:  oklch(38% 0.01 260);
+  --color-text-muted:      oklch(55% 0.01 260);
+
+  --color-rating:          oklch(50% 0.18 55);
+  --color-danger:          oklch(50% 0.22 25);
+  --color-border:          oklch(0% 0 0 / 0.1);
+  --color-border-focus:    oklch(52% 0.22 190 / 0.7);
+
+  --shadow-tile:       0 2px 12px oklch(0% 0 0 / 0.1);
+  --shadow-tile-hover: 0 8px 32px oklch(0% 0 0 / 0.15),
+                       0 0 0 1px var(--color-accent-glow);
+  --shadow-modal:      0 24px 80px oklch(0% 0 0 / 0.3);
+  --shadow-menu:       0 8px 24px oklch(0% 0 0 / 0.15);
 }
 
 @media (max-width: 640px) {
   :root {
     --page-x: var(--space-4);
   }
+}
+
+/* ── Light theme ─────────────────────────────── */
+[data-theme='light'] {
+  color-scheme: light;
+
+  --color-bg:              oklch(97% 0.005 260);
+  --color-surface:         oklch(92% 0.007 260);
+  --color-surface-raised:  oklch(87% 0.009 260);
+
+  --color-accent:          oklch(52% 0.22 190);
+  --color-accent-hover:    oklch(46% 0.22 190);
+  --color-accent-glow:     oklch(52% 0.22 190 / 0.2);
+
+  --color-text:            oklch(12% 0.01 260);
+  --color-text-secondary:  oklch(36% 0.01 260);
+  --color-text-muted:      oklch(55% 0.01 260);
+
+  --color-rating:          oklch(52% 0.17 65);
+  --color-danger:          oklch(48% 0.22 25);
+  --color-border:          oklch(0% 0 0 / 0.1);
+  --color-border-focus:    oklch(52% 0.22 190 / 0.7);
+
+  --shadow-tile:       0 2px 12px oklch(0% 0 0 / 0.1);
+  --shadow-tile-hover: 0 8px 32px oklch(0% 0 0 / 0.18),
+                       0 0 0 1px var(--color-accent-glow);
+  --shadow-modal:      0 24px 80px oklch(0% 0 0 / 0.25);
 }

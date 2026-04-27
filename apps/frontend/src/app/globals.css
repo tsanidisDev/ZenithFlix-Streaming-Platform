@@ -1,25 +1,12 @@
 @import '../styles/theme.css';
 
-@keyframes shimmer {
-  from { background-position: -800px 0; }
-  to   { background-position:  800px 0; }
-}
-
-/* Global utility — used via `composes: shimmer from global` in CSS Modules */
-.shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--color-surface) 0%,
-    var(--color-surface-raised) 50%,
-    var(--color-surface) 100%
-  );
-  background-size: 1600px 100%;
-  animation: shimmer 1.6s infinite linear;
-}
-
 html {
   color-scheme: dark;
   height: 100%;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
 }
 
 body {
