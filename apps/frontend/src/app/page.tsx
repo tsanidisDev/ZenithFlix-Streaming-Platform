@@ -9,12 +9,16 @@ import ContentModal from '../components/ContentModal/ContentModal';
 import SkeletonRow from '../components/SkeletonRow/SkeletonRow';
 import { useContent } from '../hooks/useContent';
 import { useWatchHistory } from '../hooks/useWatchHistory';
+import { useRecommendations } from '../hooks/useRecommendations';
+import { useAuth } from '../context/AuthContext';
 import type { StreamingContent } from '../types/content';
 import styles from './page.module.css';
 
 function HomeContent() {
   const { items, loading, error } = useContent();
   const { history, setProgress } = useWatchHistory();
+  const { user } = useAuth();
+  const { items: recommended } = useRecommendations({ userId: user?.sub });
   const [selected, setSelected] = useState<StreamingContent | null>(null);
   const [genreFilter, setGenreFilter] = useState('All');
   const searchParams = useSearchParams();
@@ -106,6 +110,15 @@ function HomeContent() {
               watchProgress={history}
             />
           )}
+          {recommended.length > 0 && (
+            <ContentRow
+              id="recommended"
+              title="Recommended for You"
+              items={recommended}
+              onSelect={setSelected}
+              watchProgress={history}
+            />
+          )}
           {genreFilter === 'All' && !query && (
             <ContentRow
               id="trending"
@@ -145,6 +158,7 @@ function HomeContent() {
           item={selected}
           onClose={() => setSelected(null)}
           onProgress={setProgress}
+          onSelect={setSelected}
         />
       )}
     </main>
