@@ -55,6 +55,18 @@ export default function ContentTile({ item, onClick, watchProgress = 0, rank }: 
         {item.contentType === 'live' && (
           <span className={styles.liveBadge} aria-label="Live content">LIVE</span>
         )}
+        {watchProgress > 0 && (
+          <div
+            className={styles.progress}
+            role="progressbar"
+            aria-valuenow={watchProgress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Watch progress: ${watchProgress}%`}
+          >
+            <div className={styles.progressFill} style={{ width: `${watchProgress}%` }} />
+          </div>
+        )}
       </div>
 
       <div className={styles.info}>
@@ -64,17 +76,6 @@ export default function ContentTile({ item, onClick, watchProgress = 0, rank }: 
           {item.year && genre && <span aria-hidden="true"> &middot; </span>}
           {genre && <span>{genre}</span>}
         </p>
-      </div>
-
-      <div
-        className={styles.progress}
-        role="progressbar"
-        aria-valuenow={watchProgress}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={`Watch progress: ${watchProgress}%`}
-      >
-        <div className={styles.progressFill} style={{ width: `${watchProgress}%` }} />
       </div>
     </div>
   );

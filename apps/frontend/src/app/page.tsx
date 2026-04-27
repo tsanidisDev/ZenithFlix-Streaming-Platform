@@ -8,11 +8,13 @@ import ContentRow from '../components/ContentRow/ContentRow';
 import ContentModal from '../components/ContentModal/ContentModal';
 import SkeletonRow from '../components/SkeletonRow/SkeletonRow';
 import { useContent } from '../hooks/useContent';
+import { useWatchHistory } from '../hooks/useWatchHistory';
 import type { StreamingContent } from '../types/content';
 import styles from './page.module.css';
 
 function HomeContent() {
   const { items, loading, error } = useContent();
+  const { history, setProgress } = useWatchHistory();
   const [selected, setSelected] = useState<StreamingContent | null>(null);
   const [genreFilter, setGenreFilter] = useState('All');
   const searchParams = useSearchParams();
@@ -39,6 +41,11 @@ function HomeContent() {
     .slice(0, 12);
 
   const byType = (type: string) => filtered.filter((i) => i.contentType === type);
+
+  // Items the user has started watching (progress > 0 and < 100)
+  const continueWatching = items
+    .filter((i) => (history[i.id] ?? 0) > 0 && (history[i.id] ?? 0) < 100)
+    .sort((a, b) => (history[b.id] ?? 0) - (history[a.id] ?? 0));
 
   return (
     <main className={styles.main}>
@@ -90,12 +97,22 @@ function HomeContent() {
         </>
       ) : (
         <>
+          {continueWatching.length > 0 && (
+            <ContentRow
+              id="continue-watching"
+              title="Continue Watching"
+              items={continueWatching}
+              onSelect={setSelected}
+              watchProgress={history}
+            />
+          )}
           {genreFilter === 'All' && !query && (
             <ContentRow
               id="trending"
               title="Trending Now"
               items={trending}
               onSelect={setSelected}
+              watchProgress={history}
               variant="trending"
             />
           )}
@@ -104,23 +121,32 @@ function HomeContent() {
             title="Movies"
             items={byType('movie')}
             onSelect={setSelected}
+            watchProgress={history}
           />
           <ContentRow
             id="series"
             title="Series"
             items={byType('series')}
             onSelect={setSelected}
+            watchProgress={history}
           />
           <ContentRow
             id="live"
             title="Live"
             items={byType('live')}
             onSelect={setSelected}
+            watchProgress={history}
           />
         </>
       )}
 
-      {selected && <ContentModal item={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <ContentModal
+          item={selected}
+          onClose={() => setSelected(null)}
+          onProgress={setProgress}
+        />
+      )}
     </main>
   );
 }
