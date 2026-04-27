@@ -1,0 +1,131 @@
+/* Shared styles for Movies, Series, Live, Trending pages */
+.main {
+  min-height: calc(100dvh - var(--header-h));
+  padding: var(--space-8) 0 var(--space-16);
+}
+
+.pageTitle {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-black);
+  color: var(--color-text);
+  letter-spacing: -0.03em;
+  padding: 0 var(--page-x);
+  margin-bottom: var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.liveDot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-danger);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* ── Genre filter combobox ───────────────────── */
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--page-x) var(--space-6);
+}
+
+.filterLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.selectWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.filterSelect {
+  appearance: none;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  padding: var(--space-2) var(--space-8) var(--space-2) var(--space-3);
+  cursor: pointer;
+  min-width: 9rem;
+  transition: border-color var(--duration-fast);
+  outline: none;
+}
+
+.filterSelect:hover {
+  border-color: var(--color-text-muted);
+}
+
+.filterSelect:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-accent-glow);
+}
+
+.selectChevron {
+  position: absolute;
+  right: var(--space-3);
+  pointer-events: none;
+  color: var(--color-text-muted);
+}
+
+.error {
+  padding: var(--space-4) var(--page-x);
+  font-size: var(--text-sm);
+  color: var(--color-danger);
+}
+
+/* ── Search hint + clear ─────────────────────── */
+.searchHint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--page-x) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.clearBtn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  transition: border-color var(--duration-fast), color var(--duration-fast);
+  white-space: nowrap;
+}
+
+.clearBtn:hover {
+  border-color: var(--color-text-muted);
+  color: var(--color-text);
+}
+
+/* inline variant used inside .searchHint paragraph */
+.clearBtnInline {
+  background: transparent;
+  border: none;
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  padding: 0;
+  margin-left: var(--space-2);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
