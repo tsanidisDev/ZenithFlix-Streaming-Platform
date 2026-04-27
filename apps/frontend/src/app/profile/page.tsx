@@ -26,7 +26,11 @@ export default function ProfilePage() {
             {user.email[0].toUpperCase()}
           </div>
           <h1 className={styles.email}>{user.email}</h1>
-          <p className={styles.sub}>Member since account creation</p>
+          <p className={styles.sub}>
+            {user.createdAt
+              ? `Member since ${new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
+              : 'Member since account creation'}
+          </p>
 
           <div className={styles.actions}>
             <Link href="/" className={styles.homeBtn}>Back to home</Link>
