@@ -1,0 +1,201 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: oklch(0% 0 0 / 0.6);
+  z-index: calc(var(--z-drawer) - 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-slow) var(--ease-out);
+  backdrop-filter: blur(2px);
+}
+
+.backdropVisible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(320px, 85vw);
+  z-index: var(--z-drawer);
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6);
+  gap: var(--space-4);
+  transform: translateX(100%);
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.drawerOpen {
+  transform: translateX(0);
+}
+
+.drawerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.logo {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-black);
+  color: var(--color-text);
+  letter-spacing: -0.04em;
+  user-select: none;
+}
+
+.logo em {
+  font-style: normal;
+  color: var(--color-accent);
+}
+
+.closeBtn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--duration-fast), background var(--duration-fast);
+}
+
+.closeBtn:hover {
+  color: var(--color-text);
+  background: var(--color-surface-raised);
+}
+
+.closeBtn:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.navLink:hover {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.navLink:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-2) 0;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.themeBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.themeBtn:hover {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.themeBtn:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.signOutBtn {
+  display: block;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--duration-fast);
+}
+
+.signOutBtn:hover {
+  background: oklch(62% 0.22 25 / 0.1);
+}
+
+.signOutBtn:focus-visible {
+  outline: 2px solid var(--color-danger);
+  outline-offset: 2px;
+}
+
+.authLink {
+  display: block;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.authLink:hover {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.authLinkAccent {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: oklch(10% 0 0);
+}
+
+.authLinkAccent:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  color: oklch(10% 0 0);
+}
