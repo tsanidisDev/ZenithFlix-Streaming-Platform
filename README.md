@@ -97,7 +97,7 @@ pnpm dev:frontend    # Next.js on http://localhost:3000
 - **Next.js 16 App Router** — each route in `app/` is a Server Component shell that renders a client `"use client"` page for interactivity.
 - **`useContent` hook** — all data fetching in one place. Returns `{ items, loading, error }`. Only runs when `contentType` (a primitive) changes — avoids object-reference re-render traps.
 - **`AuthContext`** — JWT stored in `localStorage` (`zenithflix_token`). A single mount-only `useEffect` reads and decodes the token (SSR constraint — `localStorage` is browser-only). Login/logout mutate state and `localStorage` directly in the event handler.
-- **Anti-FOUC theming** — `/public/theme-init.js` is loaded via Next.js `<Script strategy="beforeInteractive">`. It runs before any React JS, reads `localStorage`, and sets `data-theme` on `<html>`. No flash on page load, no `dangerouslySetInnerHTML`.
+- **Anti-FOUC theming** — Theme is resolved server-side. `layout.tsx` is an `async` Server Component that reads the `zenithflix-theme` cookie from `next/headers` and sets `data-theme` directly on `<html>` before any HTML is sent to the client. No script injection, no `dangerouslySetInnerHTML`, no flash. `ThemeContext` initialises with a lazy `useState` that reads `document.documentElement.getAttribute('data-theme')` (matching the SSR output exactly) to avoid hydration mismatches. `toggleTheme()` writes both `localStorage` and `document.cookie` so the preference survives hard refreshes.
 - **URL-scoped search** — the Header reads the current pathname via `usePathname()` and routes search to `${pathname}?q=…`. Each page reads `useSearchParams()` and filters locally. Search state never bleeds across routes.
 
 ---
@@ -166,10 +166,10 @@ Swagger UI is also available at `http://localhost:3001/api/docs` when the backen
 
 ## Assumptions & Known Limitations
 
-- **Video playback:** uses the `video_url` field with an HTML5 `<video>` tag. No real CDN or adaptive streaming (HLS/DASH). Production would use a signed URL pattern with a CDN edge layer.
-- **Watch history (Part 4):** the `useWatchHistory` hook and "Continue Watching" row are not yet implemented. The DB table and backend endpoints are in place. Frontend implementation is in progress.
-- **Frontend tests (Part 5):** Vitest + React Testing Library are not yet configured. Backend tests (Jest) are complete and passing.
+- **Video playback:** uses the `video_url` field with an HTML5 `<video>` tag. Sample seed URLs point to W3C's official HTML5 test-video assets (purpose-built for embedding).
+- **Watch history (Part 4):** fully implemented. `useWatchHistory()` stores per-item progress in `localStorage`. A "Continue Watching" row surfaces items with 0 < progress < 100%. Progress bars appear on content tiles. Video progress is written via a `timeupdate` listener in `ContentModal`, throttled so only whole-number percentage changes trigger a write.
+- **Profile page:** "Member since Month Year" is populated from the `createdAt` claim embedded in the JWT payload at login/register.
+- **Footer:** site-wide footer with ZenithFlix branding, mock social links (placeholder `#` hrefs), a fictional-content disclaimer, and the current copyright year. Lucide-react icon names diverge from standard at v1.11 — used `X`, `AtSign`, `Play`, `GitFork` as stand-ins.
 - **Forgot password:** button exists on the login page with a "not yet available" message. No reset flow or email service is implemented.
 - **Recommendations endpoint:** returns genre-overlap results from the DB. Frontend does not yet surface a recommendations row — data is available via API.
-- **Profile page:** renders a placeholder UI. No real user profile editing or avatar upload.
-- **Live TV:** renders a placeholder page. No real live stream URLs.
+- **Live TV:** fully implemented. Fetches `contentType: 'live'` items from the API, renders a scrollable `ContentRow`, supports search/filter, shows a skeleton loader, and opens the full `ContentModal` on click. The two seeded live items have no `video_url` (live events have no VOD) — the modal shows the "No video available" fallback state for those entries.
