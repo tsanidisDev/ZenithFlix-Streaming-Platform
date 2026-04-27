@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:run": "dotenv -e ../../.env -- typeorm migration:run -d dist/database/data-source.js",
     "migration:revert": "dotenv -e ../../.env -- typeorm migration:revert -d dist/database/data-source.js",
-    "migration:generate": "dotenv -e ../../.env -- typeorm migration:generate src/database/migrations/$npm_config_name -d dist/database/data-source.js"
+    "migration:generate": "dotenv -e ../../.env -- typeorm migration:generate src/database/migrations/$npm_config_name -d dist/database/data-source.js",
+    "db:seed": "nest build && dotenv -e ../../.env -- node dist/database/seed.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
