@@ -18,13 +18,14 @@ interface UseRecommendationsOptions {
  * - `contentId` → GET /recommendations/similar/:contentId (More Like This)
  *
  * Fails silently — recommendations are non-critical UI.
+ * State is only updated inside async callbacks — no synchronous setState in
+ * the effect body to avoid cascading-render warnings in React 19.
  */
 export function useRecommendations({
 	userId,
 	contentId,
 }: UseRecommendationsOptions) {
 	const [items, setItems] = useState<StreamingContent[]>([]);
-	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		if (userId == null && contentId == null) return;
@@ -35,9 +36,6 @@ export function useRecommendations({
 				? `${API_BASE}/recommendations/user/${userId}`
 				: `${API_BASE}/recommendations/similar/${contentId}`;
 
-		setItems([]);
-		setLoading(true);
-
 		fetch(endpoint)
 			.then((r) =>
 				r.ok ? (r.json() as Promise<StreamingContent[]>) : Promise.resolve([]),
@@ -47,9 +45,6 @@ export function useRecommendations({
 			})
 			.catch(() => {
 				// Recommendations are non-critical — swallow errors silently
-			})
-			.finally(() => {
-				if (!cancelled) setLoading(false);
 			});
 
 		return () => {
@@ -57,5 +52,5 @@ export function useRecommendations({
 		};
 	}, [userId, contentId]);
 
-	return { items, loading };
+	return { items };
 }

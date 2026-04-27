@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { StreamingContent } from '../streaming/entities/streaming-content.entity';
+import {
+  ContentType,
+  StreamingContent,
+} from '../streaming/entities/streaming-content.entity';
 import { WatchHistory } from '../watch-history/entities/watch-history.entity';
 
 const MAX_RECOMMENDATIONS = 10;
@@ -24,7 +27,12 @@ export class RecommendationsService {
     });
 
     if (history.length === 0) {
-      return [];
+      // No watch history — fall back to top-rated content across all types
+      return this.contentRepo
+        .createQueryBuilder('content')
+        .orderBy('content.rating', 'DESC')
+        .take(MAX_RECOMMENDATIONS)
+        .getMany();
     }
 
     // Collect all unique genres from watched content, filter out nulls
@@ -37,7 +45,12 @@ export class RecommendationsService {
     ];
 
     if (genres.length === 0) {
-      return [];
+      // No genres in watch history — fall back to top-rated
+      return this.contentRepo
+        .createQueryBuilder('content')
+        .orderBy('content.rating', 'DESC')
+        .take(MAX_RECOMMENDATIONS)
+        .getMany();
     }
 
     // Track watched content IDs so we don't recommend what the user already watched
@@ -45,19 +58,46 @@ export class RecommendationsService {
       .map((entry) => entry.content?.id)
       .filter((id): id is number => id !== undefined);
 
+    // Also track which content types the user prefers
+    const preferredTypes = [
+      ...new Set(
+        history
+          .map((entry) => entry.content?.contentType)
+          .filter((t): t is ContentType => t != null),
+      ),
+    ];
+
     // FIX 2: single batch query replacing the N+1 loop
     // FIX 3: use && (array overlap) operator for TEXT[] genre matching
     const qb = this.contentRepo
       .createQueryBuilder('content')
       .where('content.genre && ARRAY[:...genres]', { genres })
       .orderBy('content.rating', 'DESC')
-      .take(MAX_RECOMMENDATIONS);
+      .take(MAX_RECOMMENDATIONS * 2);
 
     if (watchedIds.length > 0) {
       qb.andWhere('content.id NOT IN (:...watchedIds)', { watchedIds });
     }
 
-    return qb.getMany();
+    const candidates = await qb.getMany();
+
+    // Boost preferred content types to the top
+    return candidates
+      .sort((a, b) => {
+        const preferA =
+          a.contentType != null && preferredTypes.includes(a.contentType)
+            ? 0
+            : 1;
+        const preferB =
+          b.contentType != null && preferredTypes.includes(b.contentType)
+            ? 0
+            : 1;
+        if (preferA !== preferB) return preferA - preferB;
+        return (
+          parseFloat(String(b.rating ?? 0)) - parseFloat(String(a.rating ?? 0))
+        );
+      })
+      .slice(0, MAX_RECOMMENDATIONS);
   }
 
   async getSimilar(contentId: number): Promise<StreamingContent[]> {
@@ -73,12 +113,25 @@ export class RecommendationsService {
     }
 
     // FIX 3: array overlap query instead of equality check on TEXT[] column
-    return this.contentRepo
+    // Fetch 2× limit so we can re-sort: same contentType first, then by rating
+    const candidates = await this.contentRepo
       .createQueryBuilder('content')
       .where('content.genre && ARRAY[:...genres]', { genres: content.genre })
       .andWhere('content.id != :id', { id: contentId })
       .orderBy('content.rating', 'DESC')
-      .take(MAX_RECOMMENDATIONS)
+      .take(MAX_RECOMMENDATIONS * 2)
       .getMany();
+
+    // Boost same content type to the top
+    return candidates
+      .sort((a, b) => {
+        const sameA = a.contentType === content.contentType ? 0 : 1;
+        const sameB = b.contentType === content.contentType ? 0 : 1;
+        if (sameA !== sameB) return sameA - sameB;
+        return (
+          parseFloat(String(b.rating ?? 0)) - parseFloat(String(a.rating ?? 0))
+        );
+      })
+      .slice(0, MAX_RECOMMENDATIONS);
   }
 }
