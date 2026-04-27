@@ -2,6 +2,8 @@
 
 Full-stack streaming platform — NestJS backend, Next.js 16 frontend, PostgreSQL.
 
+**Live demo:** [zenith-flix-streaming-platform-fron.vercel.app](https://zenith-flix-streaming-platform-fron.vercel.app)
+
 ---
 
 ## Project Structure
