@@ -33,7 +33,8 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
-            }
+            },
+            "description": "Register a new user. Returns an accessToken JWT. Password minimum 8 characters."
           }
         },
         {
@@ -49,34 +50,8 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Recommendations",
-      "item": [
-        {
-          "name": "Get recommendations for user",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/recommendations/user/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["recommendations", "user", "1"]
-            }
-          }
-        },
-        {
-          "name": "Get similar content",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/recommendations/similar/1",
-              "host": ["{{baseUrl}}"],
-              "path": ["recommendations", "similar", "1"]
-            }
+            },
+            "description": "Login with existing credentials. Returns an accessToken JWT. Copy the token into the {{token}} collection variable to use protected endpoints."
           }
         }
       ]
@@ -85,35 +60,39 @@
       "name": "Streaming Content",
       "item": [
         {
-          "name": "List content",
+          "name": "List All Content",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/streaming?page=1&limit=20",
               "host": ["{{baseUrl}}"],
               "path": ["streaming"],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "20" },
-                { "key": "contentType", "value": "movie", "disabled": true },
-                { "key": "genre", "value": "Drama", "disabled": true }
+                { "key": "page", "value": "1", "description": "Page number (default: 1)" },
+                { "key": "limit", "value": "20", "description": "Items per page, max 100 (default: 20)" },
+                { "key": "contentType", "value": "movie", "description": "Filter by type: movie | series | live", "disabled": true },
+                { "key": "genre", "value": "Drama", "description": "Filter by genre", "disabled": true }
               ]
-            }
+            },
+            "description": "Public endpoint. Returns paginated content. Filter by contentType (movie | series | live) and/or genre."
           }
         },
         {
-          "name": "Get content by ID",
+          "name": "Get Content by ID",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/streaming/1",
               "host": ["{{baseUrl}}"],
               "path": ["streaming", "1"]
-            }
+            },
+            "description": "Public endpoint. Returns a single content item by numeric ID. Returns 404 if not found."
           }
         },
         {
-          "name": "Create content",
+          "name": "Create Content (JWT required)",
           "request": {
             "method": "POST",
             "header": [
@@ -127,31 +106,13 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"The Dark Knight\",\n  \"description\": \"Batman faces the Joker in Gotham City.\",\n  \"thumbnailUrl\": \"https://example.com/dark-knight.jpg\",\n  \"videoUrl\": \"https://example.com/dark-knight.mp4\",\n  \"contentType\": \"movie\",\n  \"year\": 2008,\n  \"genre\": [\"Action\", \"Crime\", \"Drama\"],\n  \"rating\": 9.0,\n  \"duration\": 152,\n  \"castMembers\": [\"Christian Bale\", \"Heath Ledger\"]\n}"
-            }
-          }
-        },
-        {
-          "name": "Create live content",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/streaming",
-              "host": ["{{baseUrl}}"],
-              "path": ["streaming"]
+              "raw": "{\n  \"title\": \"Inception\",\n  \"description\": \"A thief who steals corporate secrets through dream-sharing technology.\",\n  \"thumbnailUrl\": \"https://example.com/thumb.jpg\",\n  \"videoUrl\": \"https://example.com/video.mp4\",\n  \"contentType\": \"movie\",\n  \"year\": 2010,\n  \"genre\": [\"Sci-Fi\", \"Thriller\"],\n  \"rating\": 8.8,\n  \"duration\": 148,\n  \"castMembers\": [\"Leonardo DiCaprio\", \"Joseph Gordon-Levitt\"]\n}"
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Live Gaming Tournament\",\n  \"description\": \"Championship finals streamed live.\",\n  \"videoUrl\": \"https://stream.example.com/live/finals\",\n  \"contentType\": \"live\",\n  \"genre\": [\"Gaming\", \"Esports\"]\n}"
-            }
+            "description": "Protected — requires Bearer token. Creates a new content item. Only title is required."
           }
         },
         {
-          "name": "Update content",
+          "name": "Update Content (JWT required)",
           "request": {
             "method": "PUT",
             "header": [
@@ -165,12 +126,13 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"The Dark Knight\",\n  \"rating\": 9.1\n}"
-            }
+              "raw": "{\n  \"rating\": 9.0,\n  \"description\": \"Updated description.\"\n}"
+            },
+            "description": "Protected — requires Bearer token. Partial update — all fields optional. Returns 404 if not found."
           }
         },
         {
-          "name": "Delete content",
+          "name": "Delete Content (JWT required)",
           "request": {
             "method": "DELETE",
             "header": [
@@ -180,7 +142,8 @@
               "raw": "{{baseUrl}}/streaming/1",
               "host": ["{{baseUrl}}"],
               "path": ["streaming", "1"]
-            }
+            },
+            "description": "Protected — requires Bearer token. Returns 204 No Content on success. Returns 404 if not found."
           }
         }
       ]
@@ -189,26 +152,26 @@
       "name": "Watch History",
       "item": [
         {
-          "name": "Get watch history for user",
+          "name": "Get Watch History for User",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/watch-history?userId=1",
               "host": ["{{baseUrl}}"],
               "path": ["watch-history"],
               "query": [
-                { "key": "userId", "value": "1" }
+                { "key": "userId", "value": "1", "description": "Numeric user ID (required)" }
               ]
-            }
+            },
+            "description": "Returns all watch history records for the given userId, including the related content item."
           }
         },
         {
-          "name": "Add to watch history",
+          "name": "Create Watch History Entry",
           "request": {
             "method": "POST",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/watch-history",
               "host": ["{{baseUrl}}"],
@@ -216,17 +179,16 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": 1,\n  \"contentId\": 1\n}"
-            }
+              "raw": "{\n  \"userId\": 1,\n  \"contentId\": 3\n}"
+            },
+            "description": "Creates a watch history record linking a user to a content item. Progress defaults to 0."
           }
         },
         {
-          "name": "Update watch progress",
+          "name": "Update Watch Progress",
           "request": {
             "method": "PATCH",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": {
               "raw": "{{baseUrl}}/watch-history/1/progress",
               "host": ["{{baseUrl}}"],
@@ -234,19 +196,53 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"progress\": 47.5\n}"
-            }
+              "raw": "{\n  \"progress\": 65\n}"
+            },
+            "description": "Updates the progress (0–100) for a watch history record by its ID."
           }
         },
         {
-          "name": "Delete watch history entry",
+          "name": "Delete Watch History Entry",
           "request": {
             "method": "DELETE",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/watch-history/1",
               "host": ["{{baseUrl}}"],
               "path": ["watch-history", "1"]
-            }
+            },
+            "description": "Deletes a watch history record by its ID. Returns 204 No Content."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recommendations",
+      "item": [
+        {
+          "name": "Get Personalised Recommendations for User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recommendations/user/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["recommendations", "user", "1"]
+            },
+            "description": "Returns up to 10 personalised content recommendations based on the user's watch history genres. Falls back to top-rated content if the user has no history."
+          }
+        },
+        {
+          "name": "Get Similar Content",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recommendations/similar/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["recommendations", "similar", "1"]
+            },
+            "description": "Returns up to 10 content items similar to the given contentId, ranked by genre overlap and contentType match. Returns 404 if the source item does not exist."
           }
         }
       ]
