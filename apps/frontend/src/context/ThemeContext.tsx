@@ -13,17 +13,13 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-	// Lazy initializer — runs once on the client, never on the server.
-	// During SSR, `window` is undefined so we fall back to 'dark'.
-	// The anti-FOUC script (/public/theme-init.js) already set `data-theme`
-	// on <html> before React hydrated, so there is no flash regardless of
-	// which value is stored. No useEffect needed here at all — this is
-	// exactly the pattern described in:
-	// https://react.dev/learn/you-might-not-need-an-effect
+	// Lazy initializer — reads the data-theme attribute the server already set on
+	// <html> (from the cookie). This is always in sync with the SSR output, so
+	// there is never a hydration mismatch. Falls back to 'dark' on the server.
 	const [theme, setTheme] = useState<Theme>(() => {
 		if (typeof window === 'undefined') return 'dark';
-		const stored = localStorage.getItem(STORAGE_KEY);
-		return stored === 'light' || stored === 'dark' ? stored : 'dark';
+		const attr = document.documentElement.getAttribute('data-theme');
+		return attr === 'light' ? 'light' : 'dark';
 	});
 
 	// Side effects triggered by a user action belong in the event handler,
@@ -32,6 +28,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 		const next = theme === 'dark' ? 'light' : 'dark';
 		document.documentElement.setAttribute('data-theme', next);
 		localStorage.setItem(STORAGE_KEY, next);
+		// Also write a cookie so the server can read it on the next request
+		// and set data-theme on <html> before sending HTML (no flash).
+		document.cookie = `zenithflix-theme=${next}; path=/; max-age=31536000; SameSite=Lax`;
 		setTheme(next);
 	}
 
