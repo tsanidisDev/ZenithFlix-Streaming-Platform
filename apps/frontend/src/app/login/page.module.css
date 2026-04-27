@@ -1,0 +1,163 @@
+.main {
+  min-height: calc(100dvh - var(--header-h));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) var(--space-4);
+  background: var(--color-bg);
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.logo {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-black);
+  color: var(--color-text);
+  letter-spacing: -0.04em;
+  user-select: none;
+  text-decoration: none;
+  text-align: center;
+}
+
+.logo em {
+  font-style: normal;
+  color: var(--color-accent);
+}
+
+.heading {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  text-align: center;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.input {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: var(--text-base);
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--duration-fast);
+}
+
+.input:focus {
+  border-color: var(--color-border-focus);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.errorMsg {
+  font-size: var(--text-sm);
+  color: var(--color-danger);
+  background: oklch(62% 0.22 25 / 0.1);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin: 0;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--color-accent);
+  color: oklch(10% 0 0);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--duration-fast), opacity var(--duration-fast);
+  margin-top: var(--space-2);
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submitBtn:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.footer {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.footerLink {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: var(--weight-medium);
+}
+
+.footerLink:hover {
+  text-decoration: underline;
+}
+
+/* ── Forgot password ─────────────────────────── */
+.forgotBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  padding: 0;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  transition: color var(--duration-fast);
+}
+
+.forgotBtn:hover {
+  color: var(--color-text-secondary);
+}
+
+.forgotMsg {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+}
