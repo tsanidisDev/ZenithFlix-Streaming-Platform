@@ -108,7 +108,13 @@
   --shadow-menu:       0 8px 24px oklch(0% 0 0 / 0.15);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  :root {
+    --page-x: var(--space-6);
+  }
+}
+
+@media (max-width: 480px) {
   :root {
     --page-x: var(--space-4);
   }

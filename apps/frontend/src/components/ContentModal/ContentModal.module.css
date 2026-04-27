@@ -34,14 +34,22 @@
   border-radius: var(--radius-sm);
 }
 
+.closeBar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-3) var(--space-3) 0;
+  /* sits on top of the poster image below */
+  pointer-events: none;
+}
+
 .close {
-  position: absolute;
-  top: var(--space-4);
-  right: var(--space-4);
-  z-index: 1;
-  background: oklch(0% 0 0 / 0.65);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
+  pointer-events: all;
+  background: oklch(0% 0 0 / 0.7);
+  border: 1px solid oklch(100% 0 0 / 0.18);
+  color: oklch(93% 0 0);
   font-size: 0.75rem;
   width: 2rem;
   height: 2rem;
@@ -54,11 +62,12 @@
     background var(--duration-base),
     border-color var(--duration-base);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .close:hover {
-  background: oklch(0% 0 0 / 0.88);
-  border-color: var(--color-text-muted);
+  background: oklch(0% 0 0 / 0.9);
+  border-color: oklch(100% 0 0 / 0.35);
 }
 
 .close:focus-visible {
@@ -72,6 +81,8 @@
   overflow: hidden;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   background: var(--color-surface-raised);
+  /* pull up to sit behind the sticky closeBar */
+  margin-top: calc(-1 * (var(--space-3) + 2rem + var(--space-3)));
 }
 
 .poster img {
@@ -97,6 +108,8 @@
   color: var(--color-text-muted);
   text-transform: uppercase;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  /* match poster pull-up */
+  margin-top: calc(-1 * (var(--space-3) + 2rem + var(--space-3)));
 }
 
 .info {

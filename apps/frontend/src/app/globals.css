@@ -3,6 +3,7 @@
 html {
   color-scheme: dark;
   height: 100%;
+  overflow-x: hidden;
 }
 
 [data-theme='light'] {

@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, SlidersHorizontal, X } from 'lucide-react';
 import Header from '../../components/Header/Header';
 import ContentRow from '../../components/ContentRow/ContentRow';
 import ContentModal from '../../components/ContentModal/ContentModal';
@@ -22,6 +22,7 @@ function TrendingContent() {
   const { items: recommended } = useRecommendations({ userId: user?.sub });
   const [selected, setSelected] = useState<StreamingContent | null>(null);
   const [minRating, setMinRating] = useState(0);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -55,36 +56,65 @@ function TrendingContent() {
         </p>
       )}
 
-      <div className={styles.filterBar}>
-        <label className={styles.filterLabel} htmlFor="trending-rating-filter">Min Rating</label>
-        <div className={styles.selectWrap}>
-          <select
-            id="trending-rating-filter"
-            className={styles.filterSelect}
-            value={minRating}
-            onChange={(e) => setMinRating(Number(e.target.value))}
-            aria-label="Filter by minimum rating"
-          >
-            <option value={0}>Any</option>
-            <option value={1}>1+</option>
-            <option value={2}>2+</option>
-            <option value={3}>3+</option>
-            <option value={4}>4+</option>
-            <option value={5}>5+</option>
-            <option value={6}>6+</option>
-            <option value={7}>7+</option>
-            <option value={8}>8+</option>
-            <option value={9}>9+</option>
-          </select>
-          <ChevronDown size={14} className={styles.selectChevron} aria-hidden />
-        </div>
-        {isFiltering && (
+      <div className={styles.filterSection}>
+        <div className={styles.filterHeader}>
           <button
-            className={styles.clearBtn}
-            onClick={() => { setMinRating(0); router.replace(pathname); }}
+            className={styles.filterToggle}
+            onClick={() => setFiltersOpen((o) => !o)}
+            aria-expanded={filtersOpen}
           >
-            Clear
+            <SlidersHorizontal size={14} aria-hidden />
+            Filters
+            <ChevronDown
+              size={14}
+              className={filtersOpen ? styles.filterChevronOpen : styles.filterChevron}
+              aria-hidden
+            />
           </button>
+          {minRating > 0 && (
+            <span className={styles.filterBadge}>
+              {minRating}+ ★
+              <button className={styles.badgeRemove} onClick={() => setMinRating(0)} aria-label="Remove rating filter">
+                <X size={10} aria-hidden />
+              </button>
+            </span>
+          )}
+          {isFiltering && (
+            <button
+              className={styles.clearBtn}
+              onClick={() => { setMinRating(0); router.replace(pathname); }}
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+        {filtersOpen && (
+          <div className={styles.filterBar}>
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel} htmlFor="trending-rating-filter">Min Rating</label>
+              <div className={styles.selectWrap}>
+                <select
+                  id="trending-rating-filter"
+                  className={styles.filterSelect}
+                  value={minRating}
+                  onChange={(e) => setMinRating(Number(e.target.value))}
+                  aria-label="Filter by minimum rating"
+                >
+                  <option value={0}>Any</option>
+                  <option value={1}>1+</option>
+                  <option value={2}>2+</option>
+                  <option value={3}>3+</option>
+                  <option value={4}>4+</option>
+                  <option value={5}>5+</option>
+                  <option value={6}>6+</option>
+                  <option value={7}>7+</option>
+                  <option value={8}>8+</option>
+                  <option value={9}>9+</option>
+                </select>
+                <ChevronDown size={14} className={styles.selectChevron} aria-hidden />
+              </div>
+            </div>
+          </div>
         )}
       </div>
 

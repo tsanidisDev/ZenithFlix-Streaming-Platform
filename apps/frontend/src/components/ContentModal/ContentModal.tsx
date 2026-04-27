@@ -52,9 +52,10 @@ export default function ContentModal({ item, onClose, onProgress, onSelect, watc
     const panel = panelRef.current;
     if (!panel) return;
 
-    // Lock body scroll
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    // Lock body scroll — iOS Safari ignores overflow:hidden on body;
+    // the position:fixed + stored scrollY trick works universally.
+    const scrollY = window.scrollY;
+    document.body.style.cssText += `; position: fixed; top: -${scrollY}px; left: 0; right: 0; overflow-y: scroll;`;
 
     // Focus trap
     const focusable = panel.querySelectorAll<HTMLElement>(
@@ -87,7 +88,16 @@ export default function ContentModal({ item, onClose, onProgress, onSelect, watc
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = prevOverflow;
+      // Restore scroll position
+      const storedTop = document.body.style.top;
+      document.body.style.cssText = document.body.style.cssText
+        .replace(/;?\s*position:\s*fixed[^;]*/g, '')
+        .replace(/;?\s*top:\s*-?[\d.]+px[^;]*/g, '')
+        .replace(/;?\s*left:\s*0[^;]*/g, '')
+        .replace(/;?\s*right:\s*0[^;]*/g, '')
+        .replace(/;?\s*overflow-y:\s*scroll[^;]*/g, '');
+      const y = parseInt(storedTop || '0', 10);
+      window.scrollTo(0, -y);
     };
   }, [onClose]);
 
@@ -106,14 +116,16 @@ export default function ContentModal({ item, onClose, onProgress, onSelect, watc
         className={styles.panel}
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          ref={closeBtnRef}
-          className={styles.close}
-          onClick={onClose}
-          aria-label="Close"
-        >
-          &#10005;
-        </button>
+        <div className={styles.closeBar}>
+          <button
+            ref={closeBtnRef}
+            className={styles.close}
+            onClick={onClose}
+            aria-label="Close"
+          >
+            &#10005;
+          </button>
+        </div>
 
         {item.thumbnailUrl ? (
           <div className={styles.poster}>
