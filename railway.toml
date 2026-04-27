@@ -8,7 +8,8 @@ healthcheckPath = "/api"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
-releaseCommand = "cd apps/backend && pnpm migration:run:prod"
+# Migrations are run via Railway dashboard → "Pre-deploy Command":
+# cd apps/backend && pnpm migration:run:prod
 
 [environments.production.deploy]
 numReplicas = 1
