@@ -90,7 +90,6 @@ export default function ContentModal({ item, onClose, onProgress }: Props) {
     <div
       className={styles.backdrop}
       onClick={onClose}
-      aria-hidden="true"
     >
       <div
         ref={panelRef}
