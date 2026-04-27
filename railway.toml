@@ -1,0 +1,14 @@
+[build]
+builder = "railpack"
+buildCommand = "pnpm install --frozen-lockfile && pnpm --filter backend build"
+
+[deploy]
+startCommand = "node apps/backend/dist/main"
+healthcheckPath = "/api"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+releaseCommand = "cd apps/backend && pnpm migration:run:prod"
+
+[environments.production.deploy]
+numReplicas = 1
