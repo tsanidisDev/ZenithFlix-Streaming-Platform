@@ -1,0 +1,2 @@
+# Railway config lives at the repo root (railway.toml) so that pnpm
+# workspace installs resolve correctly. Do not add config here.

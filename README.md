@@ -164,6 +164,18 @@ Swagger UI is also available at `http://localhost:3001/api/docs` when the backen
 
 ---
 
+## Deployment
+
+| Service | Platform | Config |
+|---------|----------|--------|
+| PostgreSQL | [Neon](https://neon.tech) | Serverless Postgres — `DATABASE_URL` connection string injected as env var |
+| NestJS API | [Railway](https://railway.app) | `railway.toml` at repo root — builds with nixpacks, runs migrations on release, starts `node apps/backend/dist/main` |
+| Next.js App | [Vercel](https://vercel.com) | `vercel.json` at repo root — builds `apps/frontend`, requires `NEXT_PUBLIC_API_URL` env var pointing to the Railway backend |
+
+Required env vars per platform are documented in `.env.example`.
+
+---
+
 ## Assumptions & Known Limitations
 
 - **Video playback:** uses the `video_url` field with an HTML5 `<video>` tag. Sample seed URLs point to W3C's official HTML5 test-video assets (purpose-built for embedding).
