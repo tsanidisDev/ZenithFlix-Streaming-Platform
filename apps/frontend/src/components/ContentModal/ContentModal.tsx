@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import type { StreamingContent } from '../../types/content';
+import { useRecommendations } from '../../hooks/useRecommendations';
 import styles from './ContentModal.module.css';
 
 interface Props {
@@ -9,12 +10,16 @@ interface Props {
   onClose: () => void;
   /** Called as the video plays with the current progress percentage (0–100). */
   onProgress?: (contentId: number, progress: number) => void;
+  /** Called when the user picks a similar item — replaces the current modal. */
+  onSelect?: (item: StreamingContent) => void;
 }
 
-export default function ContentModal({ item, onClose, onProgress }: Props) {
+export default function ContentModal({ item, onClose, onProgress, onSelect }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const { items: similar } = useRecommendations({ contentId: item.id });
 
   // Stable callback so we don't re-register the listener on every render
   const handleTimeUpdate = useCallback(() => {
@@ -156,6 +161,35 @@ export default function ContentModal({ item, onClose, onProgress }: Props) {
             </div>
           )}
         </div>
+
+        {similar.length > 0 && onSelect && (
+          <div className={styles.similar}>
+            <p className={styles.similarHeading}>More Like This</p>
+            <div className={styles.similarScroll}>
+              {similar.map((s) => (
+                <button
+                  key={s.id}
+                  className={styles.similarCard}
+                  onClick={() => onSelect(s)}
+                  aria-label={`Open ${s.title}`}
+                >
+                  {s.thumbnailUrl ? (
+                    <img
+                      className={styles.similarThumb}
+                      src={s.thumbnailUrl}
+                      alt={`${s.title} poster`}
+                    />
+                  ) : (
+                    <div className={styles.similarThumbFallback} aria-hidden="true">
+                      {s.title[0]}
+                    </div>
+                  )}
+                  <span className={styles.similarTitle}>{s.title}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
