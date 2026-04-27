@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import { ChevronLeft, ChevronRight, TrendingUp } from 'lucide-react';
 import ContentTile from '../ContentTile/ContentTile';
 import type { StreamingContent } from '../../types/content';
 import styles from './ContentRow.module.css';
@@ -11,9 +12,17 @@ interface Props {
   items: StreamingContent[];
   onSelect: (item: StreamingContent) => void;
   watchProgress?: Record<number, number>;
+  variant?: 'default' | 'trending';
 }
 
-export default function ContentRow({ id, title, items, onSelect, watchProgress = {} }: Props) {
+export default function ContentRow({
+  id,
+  title,
+  items,
+  onSelect,
+  watchProgress = {},
+  variant = 'default',
+}: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
 
   if (items.length === 0) return null;
@@ -24,25 +33,35 @@ export default function ContentRow({ id, title, items, onSelect, watchProgress =
     el.scrollBy({ left: dir === 'right' ? 640 : -640, behavior: 'smooth' });
   }
 
+  const isTrending = variant === 'trending';
+
   return (
-    <section id={id} className={styles.row} aria-label={title}>
-      <h2 className={styles.title}>{title}</h2>
+    <section
+      id={id}
+      className={`${styles.row} ${isTrending ? styles.rowTrending : ''}`}
+      aria-label={title}
+    >
+      <h2 className={`${styles.title} ${isTrending ? styles.titleTrending : ''}`}>
+        {isTrending && <TrendingUp size={18} className={styles.trendingBadge} aria-hidden="true" />}
+        {title}
+      </h2>
       <div className={styles.wrapper}>
         <button
           className={`${styles.btn} ${styles.btnLeft}`}
           onClick={() => scroll('left')}
           aria-label={`Scroll ${title} left`}
         >
-          &#8249;
+          <ChevronLeft size={28} />
         </button>
 
         <div ref={trackRef} className={styles.track} role="list">
-          {items.map((item) => (
+          {items.map((item, index) => (
             <div key={item.id} role="listitem">
               <ContentTile
                 item={item}
                 onClick={onSelect}
                 watchProgress={watchProgress[item.id] ?? 0}
+                rank={isTrending ? index + 1 : undefined}
               />
             </div>
           ))}
@@ -53,9 +72,10 @@ export default function ContentRow({ id, title, items, onSelect, watchProgress =
           onClick={() => scroll('right')}
           aria-label={`Scroll ${title} right`}
         >
-          &#8250;
+          <ChevronRight size={28} />
         </button>
       </div>
     </section>
   );
 }
+

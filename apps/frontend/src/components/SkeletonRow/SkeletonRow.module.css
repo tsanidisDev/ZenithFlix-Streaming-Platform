@@ -2,8 +2,29 @@
   margin-bottom: var(--space-10);
 }
 
+/* Shimmer animation applied to all skeleton placeholder elements via a shared selector.
+   Previously used `composes: shimmer from global` (CSS Modules) which trips CSS linters.
+   Grouping the selector here is cleaner and keeps the animation self-contained. */
+.title,
+.thumb,
+.line,
+.lineShort {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 0%,
+    var(--color-surface-raised) 50%,
+    var(--color-surface) 100%
+  );
+  background-size: 1600px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+@keyframes shimmer {
+  from { background-position: -800px 0; }
+  to   { background-position:  800px 0; }
+}
+
 .title {
-  composes: shimmer from global;
   height: 1rem;
   width: 150px;
   border-radius: var(--radius-sm);
@@ -24,20 +45,17 @@
 }
 
 .thumb {
-  composes: shimmer from global;
   width: 100%;
   aspect-ratio: 16 / 9;
 }
 
 .line {
-  composes: shimmer from global;
   height: 0.75rem;
   margin-top: var(--space-3);
   border-radius: var(--radius-sm);
 }
 
 .lineShort {
-  composes: shimmer from global;
   height: 0.625rem;
   width: 60%;
   margin-top: var(--space-2);
