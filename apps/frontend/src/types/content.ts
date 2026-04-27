@@ -2,14 +2,17 @@ export interface StreamingContent {
   id: number;
   title: string;
   description: string | null;
-  thumbnail_url: string | null;
-  video_url: string | null;
-  genre: string;
-  content_type: 'movie' | 'series' | 'live';
-  release_year: number;
-  rating: string | number;
-  created_at: string;
-  updated_at: string;
+  thumbnailUrl: string | null;
+  videoUrl: string | null;
+  contentType: 'movie' | 'series' | 'live' | null;
+  year: number | null;
+  genre: string[] | null;
+  rating: string | number | null;
+  duration: number | null;
+  castMembers: string[] | null;
+  watchProgress: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PaginatedResponse {
@@ -17,4 +20,5 @@ export interface PaginatedResponse {
   total: number;
   page: number;
   limit: number;
+  totalPages: number;
 }
