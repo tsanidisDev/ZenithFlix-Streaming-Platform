@@ -12,9 +12,11 @@ interface Props {
   onProgress?: (contentId: number, progress: number) => void;
   /** Called when the user picks a similar item — replaces the current modal. */
   onSelect?: (item: StreamingContent) => void;
+  /** Watch progress map (contentId → 0-100) used to show progress on similar cards. */
+  watchProgress?: Record<number, number>;
 }
 
-export default function ContentModal({ item, onClose, onProgress, onSelect }: Props) {
+export default function ContentModal({ item, onClose, onProgress, onSelect, watchProgress }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -166,27 +168,47 @@ export default function ContentModal({ item, onClose, onProgress, onSelect }: Pr
           <div className={styles.similar}>
             <p className={styles.similarHeading}>More Like This</p>
             <div className={styles.similarScroll}>
-              {similar.map((s) => (
-                <button
-                  key={s.id}
-                  className={styles.similarCard}
-                  onClick={() => onSelect(s)}
-                  aria-label={`Open ${s.title}`}
-                >
-                  {s.thumbnailUrl ? (
-                    <img
-                      className={styles.similarThumb}
-                      src={s.thumbnailUrl}
-                      alt={`${s.title} poster`}
-                    />
-                  ) : (
-                    <div className={styles.similarThumbFallback} aria-hidden="true">
-                      {s.title[0]}
+              {similar.map((s) => {
+                const pct = watchProgress?.[s.id] ?? 0;
+                return (
+                  <button
+                    key={s.id}
+                    className={styles.similarCard}
+                    onClick={() => onSelect(s)}
+                    aria-label={`Open ${s.title}`}
+                  >
+                    <div className={styles.similarThumbWrap}>
+                      {s.thumbnailUrl ? (
+                        <img
+                          className={styles.similarThumb}
+                          src={s.thumbnailUrl}
+                          alt={`${s.title} poster`}
+                        />
+                      ) : (
+                        <div className={styles.similarThumbFallback} aria-hidden="true">
+                          {s.title[0]}
+                        </div>
+                      )}
+                      {pct > 0 && pct < 100 && (
+                        <div
+                          className={styles.similarProgress}
+                          role="progressbar"
+                          aria-valuenow={Math.round(pct)}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`${Math.round(pct)}% watched`}
+                        >
+                          <div
+                            className={styles.similarProgressBar}
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                      )}
                     </div>
-                  )}
-                  <span className={styles.similarTitle}>{s.title}</span>
-                </button>
-              ))}
+                    <span className={styles.similarTitle}>{s.title}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}

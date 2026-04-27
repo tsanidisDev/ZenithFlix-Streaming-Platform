@@ -16,11 +16,14 @@ import styles from './page.module.css';
 
 function HomeContent() {
   const { items, loading, error } = useContent();
-  const { history, setProgress } = useWatchHistory();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
+  const auth = user && token ? { userId: user.sub, token } : undefined;
+  const { history, setProgress } = useWatchHistory(auth);
   const { items: recommended } = useRecommendations({ userId: user?.sub });
   const [selected, setSelected] = useState<StreamingContent | null>(null);
   const [genreFilter, setGenreFilter] = useState('All');
+  const [typeFilter, setTypeFilter] = useState('All');
+  const [minRating, setMinRating] = useState(0);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -37,14 +40,17 @@ function HomeContent() {
       )
     : items;
 
-  const filtered =
-    genreFilter === 'All' ? searched : searched.filter((i) => i.genre?.includes(genreFilter));
+  const filtered = (genreFilter === 'All' ? searched : searched.filter((i) => i.genre?.includes(genreFilter)))
+    .filter((i) => typeFilter === 'All' || i.contentType === typeFilter)
+    .filter((i) => minRating === 0 || parseFloat(String(i.rating ?? 0)) >= minRating);
+
+  const isFiltering = genreFilter !== 'All' || typeFilter !== 'All' || query !== '' || minRating > 0;
 
   const trending = [...items]
     .sort((a, b) => parseFloat(String(b.rating ?? 0)) - parseFloat(String(a.rating ?? 0)))
     .slice(0, 12);
 
-  const byType = (type: string) => filtered.filter((i) => i.contentType === type);
+  const byType = (type: string) => filtered.filter((i) => typeFilter === 'All' ? i.contentType === type : true);
 
   // Items the user has started watching (progress > 0 and < 100)
   const continueWatching = items
@@ -80,11 +86,51 @@ function HomeContent() {
           </select>
           <ChevronDown size={14} className={styles.selectChevron} aria-hidden />
         </div>
-        {(genreFilter !== 'All' || query) && (
+        <label className={styles.filterLabel} htmlFor="home-type-filter">Type</label>
+        <div className={styles.selectWrap}>
+          <select
+            id="home-type-filter"
+            className={styles.filterSelect}
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            aria-label="Filter by content type"
+          >
+            <option value="All">All Types</option>
+            <option value="movie">Movie</option>
+            <option value="series">Series</option>
+            <option value="live">Live</option>
+          </select>
+          <ChevronDown size={14} className={styles.selectChevron} aria-hidden />
+        </div>
+        <label className={styles.filterLabel} htmlFor="home-rating-filter">Min Rating</label>
+        <div className={styles.selectWrap}>
+          <select
+            id="home-rating-filter"
+            className={styles.filterSelect}
+            value={minRating}
+            onChange={(e) => setMinRating(Number(e.target.value))}
+            aria-label="Filter by minimum rating"
+          >
+            <option value={0}>Any</option>
+            <option value={1}>1+</option>
+            <option value={2}>2+</option>
+            <option value={3}>3+</option>
+            <option value={4}>4+</option>
+            <option value={5}>5+</option>
+            <option value={6}>6+</option>
+            <option value={7}>7+</option>
+            <option value={8}>8+</option>
+            <option value={9}>9+</option>
+          </select>
+          <ChevronDown size={14} className={styles.selectChevron} aria-hidden />
+        </div>
+        {isFiltering && (
           <button
             className={styles.clearBtn}
             onClick={() => {
               setGenreFilter('All');
+              setTypeFilter('All');
+              setMinRating(0);
               router.replace(pathname);
             }}
           >
@@ -101,7 +147,7 @@ function HomeContent() {
         </>
       ) : (
         <>
-          {continueWatching.length > 0 && (
+          {continueWatching.length > 0 && !isFiltering && (
             <ContentRow
               id="continue-watching"
               title="Continue Watching"
@@ -110,7 +156,7 @@ function HomeContent() {
               watchProgress={history}
             />
           )}
-          {recommended.length > 0 && (
+          {recommended.length > 0 && !isFiltering && (
             <ContentRow
               id="recommended"
               title="Recommended for You"
@@ -119,7 +165,7 @@ function HomeContent() {
               watchProgress={history}
             />
           )}
-          {genreFilter === 'All' && !query && (
+          {!isFiltering && (
             <ContentRow
               id="trending"
               title="Trending Now"
@@ -129,27 +175,33 @@ function HomeContent() {
               variant="trending"
             />
           )}
-          <ContentRow
-            id="movies"
-            title="Movies"
-            items={byType('movie')}
-            onSelect={setSelected}
-            watchProgress={history}
-          />
-          <ContentRow
-            id="series"
-            title="Series"
-            items={byType('series')}
-            onSelect={setSelected}
-            watchProgress={history}
-          />
-          <ContentRow
-            id="live"
-            title="Live"
-            items={byType('live')}
-            onSelect={setSelected}
-            watchProgress={history}
-          />
+          {(typeFilter === 'All' || typeFilter === 'movie') && (
+            <ContentRow
+              id="movies"
+              title="Movies"
+              items={byType('movie')}
+              onSelect={setSelected}
+              watchProgress={history}
+            />
+          )}
+          {(typeFilter === 'All' || typeFilter === 'series') && (
+            <ContentRow
+              id="series"
+              title="Series"
+              items={byType('series')}
+              onSelect={setSelected}
+              watchProgress={history}
+            />
+          )}
+          {(typeFilter === 'All' || typeFilter === 'live') && (
+            <ContentRow
+              id="live"
+              title="Live"
+              items={byType('live')}
+              onSelect={setSelected}
+              watchProgress={history}
+            />
+          )}
         </>
       )}
 
@@ -159,6 +211,7 @@ function HomeContent() {
           onClose={() => setSelected(null)}
           onProgress={setProgress}
           onSelect={setSelected}
+          watchProgress={history}
         />
       )}
     </main>

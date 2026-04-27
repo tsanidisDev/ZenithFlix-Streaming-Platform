@@ -7,11 +7,16 @@ import ContentRow from '../../components/ContentRow/ContentRow';
 import ContentModal from '../../components/ContentModal/ContentModal';
 import SkeletonRow from '../../components/SkeletonRow/SkeletonRow';
 import { useContent } from '../../hooks/useContent';
+import { useWatchHistory } from '../../hooks/useWatchHistory';
+import { useAuth } from '../../context/AuthContext';
 import type { StreamingContent } from '../../types/content';
 import styles from '../section.module.css';
 
 function LiveContent() {
   const { items, loading, error } = useContent({ contentType: 'live' });
+  const { user, token } = useAuth();
+  const auth = user && token ? { userId: user.sub, token } : undefined;
+  const { history, setProgress } = useWatchHistory(auth);
   const [selected, setSelected] = useState<StreamingContent | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -53,9 +58,21 @@ function LiveContent() {
       {loading ? (
         <SkeletonRow title="Live" />
       ) : (
-        <ContentRow title="Live Events" items={filtered} onSelect={setSelected} />
+        <ContentRow
+          title="Live Events"
+          items={filtered}
+          onSelect={setSelected}
+          watchProgress={history}
+        />
       )}
-      {selected && <ContentModal item={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <ContentModal
+          item={selected}
+          onClose={() => setSelected(null)}
+          onProgress={setProgress}
+          onSelect={setSelected}
+        />
+      )}
     </main>
   );
 }

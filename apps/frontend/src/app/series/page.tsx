@@ -8,13 +8,21 @@ import ContentRow from '../../components/ContentRow/ContentRow';
 import ContentModal from '../../components/ContentModal/ContentModal';
 import SkeletonRow from '../../components/SkeletonRow/SkeletonRow';
 import { useContent } from '../../hooks/useContent';
+import { useWatchHistory } from '../../hooks/useWatchHistory';
+import { useRecommendations } from '../../hooks/useRecommendations';
+import { useAuth } from '../../context/AuthContext';
 import type { StreamingContent } from '../../types/content';
 import styles from '../section.module.css';
 
 function SeriesContent() {
   const { items, loading, error } = useContent({ contentType: 'series' });
+  const { user, token } = useAuth();
+  const auth = user && token ? { userId: user.sub, token } : undefined;
+  const { history, setProgress } = useWatchHistory(auth);
+  const { items: recommended } = useRecommendations({ userId: user?.sub });
   const [selected, setSelected] = useState<StreamingContent | null>(null);
   const [genreFilter, setGenreFilter] = useState('All');
+  const [minRating, setMinRating] = useState(0);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -29,13 +37,16 @@ function SeriesContent() {
           i.description?.toLowerCase().includes(query),
       )
     : items;
-  const filtered =
-    genreFilter === 'All' ? searched : searched.filter((i) => i.genre?.includes(genreFilter));
 
-  const hasFilters = genreFilter !== 'All' || query !== '';
+  const filtered = (genreFilter === 'All' ? searched : searched.filter((i) => i.genre?.includes(genreFilter)))
+    .filter((i) => minRating === 0 || parseFloat(String(i.rating ?? 0)) >= minRating);
+
+  const recommendedSeries = recommended.filter((i) => i.contentType === 'series');
+  const isFiltering = genreFilter !== 'All' || query !== '' || minRating > 0;
 
   function clearFilters() {
     setGenreFilter('All');
+    setMinRating(0);
     router.replace(pathname);
   }
 
@@ -68,7 +79,29 @@ function SeriesContent() {
           </select>
           <ChevronDown size={14} className={styles.selectChevron} aria-hidden />
         </div>
-        {hasFilters && (
+        <label className={styles.filterLabel} htmlFor="series-rating-filter">Min Rating</label>
+        <div className={styles.selectWrap}>
+          <select
+            id="series-rating-filter"
+            className={styles.filterSelect}
+            value={minRating}
+            onChange={(e) => setMinRating(Number(e.target.value))}
+            aria-label="Filter by minimum rating"
+          >
+            <option value={0}>Any</option>
+            <option value={1}>1+</option>
+            <option value={2}>2+</option>
+            <option value={3}>3+</option>
+            <option value={4}>4+</option>
+            <option value={5}>5+</option>
+            <option value={6}>6+</option>
+            <option value={7}>7+</option>
+            <option value={8}>8+</option>
+            <option value={9}>9+</option>
+          </select>
+          <ChevronDown size={14} className={styles.selectChevron} aria-hidden />
+        </div>
+        {isFiltering && (
           <button className={styles.clearBtn} onClick={clearFilters}>
             Clear
           </button>
@@ -78,9 +111,32 @@ function SeriesContent() {
       {loading ? (
         <SkeletonRow title="Series" />
       ) : (
-        <ContentRow title="All Series" items={filtered} onSelect={setSelected} />
+        <>
+          {recommendedSeries.length > 0 && !isFiltering && (
+            <ContentRow
+              title="Recommended Series"
+              items={recommendedSeries}
+              onSelect={setSelected}
+              watchProgress={history}
+            />
+          )}
+          <ContentRow
+            title="All Series"
+            items={filtered}
+            onSelect={setSelected}
+            watchProgress={history}
+          />
+        </>
       )}
-      {selected && <ContentModal item={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <ContentModal
+          item={selected}
+          onClose={() => setSelected(null)}
+          onProgress={setProgress}
+          onSelect={setSelected}
+          watchProgress={history}
+        />
+      )}
     </main>
   );
 }
