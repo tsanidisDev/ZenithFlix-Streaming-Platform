@@ -3,86 +3,94 @@
   min-height: calc(100dvh - var(--header-h));
 }
 
-.filters {
+.searchHint {
   display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  padding: 0 var(--page-x) var(--space-6);
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--page-x) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
-.pill {
+.clearBtn {
   background: transparent;
   border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   color: var(--color-text-secondary);
-  padding: var(--space-2) var(--space-5);
-  border-radius: var(--radius-pill);
   font-size: var(--text-sm);
+  font-family: inherit;
+  padding: var(--space-2) var(--space-4);
   cursor: pointer;
-  transition:
-    background var(--duration-base),
-    border-color var(--duration-base),
-    color var(--duration-base);
+  transition: border-color var(--duration-fast), color var(--duration-fast);
+  white-space: nowrap;
 }
 
-.pill:hover {
+.clearBtn:hover {
   border-color: var(--color-text-muted);
   color: var(--color-text);
 }
 
-.pill:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
+.errorBanner {
+  padding: var(--space-3) var(--page-x);
+  font-size: var(--text-sm);
+  color: var(--color-danger);
+  background: oklch(62% 0.22 25 / 0.08);
+  border-radius: var(--radius-md);
+  margin: 0 var(--page-x) var(--space-4);
 }
 
-.pillActive {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: oklch(10% 0 0);
-  font-weight: var(--weight-medium);
-}
-
-.pillActive:hover {
-  background: var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
-  color: oklch(10% 0 0);
-}
-
-.error {
-  min-height: calc(100dvh - var(--header-h));
+/* ── Genre filter combobox ───────────────────── */
+.filterBar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: var(--space-3);
+  padding: 0 var(--page-x) var(--space-6);
 }
 
-.errorText {
+.filterLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* Wrapper gives the native <select> a Lucide chevron without SVG data-URLs */
+.selectWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.filterSelect {
+  appearance: none;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  padding: var(--space-2) var(--space-8) var(--space-2) var(--space-3);
+  cursor: pointer;
+  min-width: 9rem;
+  transition: border-color var(--duration-fast);
+  outline: none;
+}
+
+/* Lucide ChevronDown — sits on top, pointer-events:none so clicks pass through */
+.selectChevron {
+  position: absolute;
+  right: var(--space-3);
+  pointer-events: none;
   color: var(--color-text-muted);
-  font-size: var(--text-base);
 }
 
-@media (max-width: 640px) {
-  .filters {
-    padding-bottom: var(--space-5);
-  }
+.filterSelect:hover {
+  border-color: var(--color-text-muted);
 }
 
-.main {
-  display: flex;
-  flex: 1;
-  width: 100%;
-  max-width: 800px;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  background-color: var(--foreground);
-  padding: 120px 60px;
-}
-
-.intro {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 24px;
+.filterSelect:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-accent-glow);
 }
 
 .intro h1 {
