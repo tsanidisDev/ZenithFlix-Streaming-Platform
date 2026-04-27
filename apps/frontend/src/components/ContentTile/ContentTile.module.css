@@ -177,12 +177,16 @@
 }
 
 .progress {
-  height: 2px;
-  background: var(--color-border);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: oklch(0% 0 0 / 0.4);
 }
 
 .progressFill {
   height: 100%;
   background: var(--color-accent);
-  transition: width var(--duration-slow) var(--ease-out);
+  transition: width 0.4s ease;
 }
