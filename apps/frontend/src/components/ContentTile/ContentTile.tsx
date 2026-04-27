@@ -7,10 +7,12 @@ interface Props {
   item: StreamingContent;
   onClick: (item: StreamingContent) => void;
   watchProgress?: number;
+  rank?: number;
 }
 
-export default function ContentTile({ item, onClick, watchProgress = 0 }: Props) {
-  const rating = parseFloat(String(item.rating)).toFixed(1);
+export default function ContentTile({ item, onClick, watchProgress = 0, rank }: Props) {
+  const rating = item.rating != null ? parseFloat(String(item.rating)).toFixed(1) : null;
+  const genre = item.genre?.[0] ?? null;
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -21,16 +23,22 @@ export default function ContentTile({ item, onClick, watchProgress = 0 }: Props)
 
   return (
     <div
-      className={styles.tile}
+      className={`${styles.tile} ${rank != null ? styles.tileHero : ''}`}
       onClick={() => onClick(item)}
       onKeyDown={handleKeyDown}
       role="button"
       tabIndex={0}
-      aria-label={`${item.title}, ${item.content_type}, ${item.release_year}, rated ${rating} out of 10`}
+      aria-label={`${item.title}${item.contentType ? `, ${item.contentType}` : ''}${item.year ? `, ${item.year}` : ''}${rating ? `, rated ${rating} out of 10` : ''}`}
     >
+      {rank != null && (
+        <span className={styles.rank} aria-hidden="true">
+          {rank}
+        </span>
+      )}
+
       <div className={styles.thumbnail}>
-        {item.thumbnail_url ? (
-          <img src={item.thumbnail_url} alt="" />
+        {item.thumbnailUrl ? (
+          <img src={item.thumbnailUrl} alt="" />
         ) : (
           <div className={styles.fallback} aria-hidden="true">
             <span>{item.title[0]}</span>
@@ -39,15 +47,22 @@ export default function ContentTile({ item, onClick, watchProgress = 0 }: Props)
         <div className={styles.overlay} aria-hidden="true">
           <span className={styles.play}>&#9654;</span>
         </div>
-        <span className={styles.rating} aria-hidden="true">
-          &#9733; {rating}
-        </span>
+        {rating && (
+          <span className={styles.rating} aria-hidden="true">
+            &#9733; {rating}
+          </span>
+        )}
+        {item.contentType === 'live' && (
+          <span className={styles.liveBadge} aria-label="Live content">LIVE</span>
+        )}
       </div>
 
       <div className={styles.info}>
         <p className={styles.title}>{item.title}</p>
         <p className={styles.meta}>
-          {item.release_year} &middot; {item.genre}
+          {item.year && <span>{item.year}</span>}
+          {item.year && genre && <span aria-hidden="true"> &middot; </span>}
+          {genre && <span>{genre}</span>}
         </p>
       </div>
 
@@ -64,3 +79,4 @@ export default function ContentTile({ item, onClick, watchProgress = 0 }: Props)
     </div>
   );
 }
+

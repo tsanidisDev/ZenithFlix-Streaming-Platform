@@ -83,9 +83,9 @@ export default function ContentModal({ item, onClose }: Props) {
           &#10005;
         </button>
 
-        {item.thumbnail_url ? (
+        {item.thumbnailUrl ? (
           <div className={styles.poster}>
-            <img src={item.thumbnail_url} alt={`${item.title} poster`} />
+            <img src={item.thumbnailUrl} alt={`${item.title} poster`} />
           </div>
         ) : (
           <div className={styles.posterFallback} aria-hidden="true">
@@ -98,10 +98,10 @@ export default function ContentModal({ item, onClose }: Props) {
             {item.title}
           </h2>
           <div className={styles.meta}>
-            <span className={styles.year}>{item.release_year}</span>
-            <span className={styles.genre}>{item.genre}</span>
+            <span className={styles.year}>{item.year}</span>
+            <span className={styles.genre}>{item.genre?.join(', ')}</span>
             <span className={styles.rating}>&#9733; {rating}</span>
-            <span className={styles.badge}>{item.content_type}</span>
+            <span className={styles.badge}>{item.contentType}</span>
           </div>
           {item.description && (
             <p className={styles.description}>{item.description}</p>
@@ -109,14 +109,14 @@ export default function ContentModal({ item, onClose }: Props) {
         </div>
 
         <div className={styles.video}>
-          {item.video_url ? (
+          {item.videoUrl ? (
             <video
               className={styles.videoPlayer}
               controls
               preload="metadata"
               aria-label={`Watch ${item.title}`}
             >
-              <source src={item.video_url} />
+              <source src={item.videoUrl} />
               Your browser does not support the video element.
             </video>
           ) : (

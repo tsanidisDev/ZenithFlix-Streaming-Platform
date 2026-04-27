@@ -1,18 +1,66 @@
 .row {
   margin-bottom: var(--space-10);
+  padding-inline: var(--page-x); /* sets the x-boundary for title alignment */
 }
 
+/* ── Trending variant ───────────────────────── */
+.rowTrending {
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-2);
+  padding-inline: 0; /* trending uses margin, not padding */
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  margin-left: var(--page-x);
+  margin-right: var(--page-x);
+  margin-bottom: var(--space-12);
+}
+
+.rowTrending .title {
+  padding-left: var(--space-6);
+}
+
+.rowTrending .wrapper {
+  margin-inline: 0; /* don't break out of the trending card bounds */
+}
+
+.rowTrending .track {
+  padding-left: var(--space-6);
+  padding-right: var(--space-6);
+  gap: var(--space-1);
+}
+
+/* trending buttons match the narrower track padding */
+.rowTrending .btn {
+  width: var(--space-6);
+}
+
+.titleTrending {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xl);
+  color: var(--color-accent);
+}
+
+.trendingBadge {
+  font-size: var(--text-base);
+  opacity: 0.9;
+}
+
+/* ── Row title ──────────────────────────────── */
 .title {
   font-size: var(--text-lg);
   font-weight: var(--weight-bold);
   color: var(--color-text);
-  padding: 0 var(--page-x);
+  /* no inline padding — .row provides it so title left-edge = first card left-edge */
   margin-bottom: var(--space-4);
   letter-spacing: -0.01em;
 }
 
 .wrapper {
   position: relative;
+  /* break out of .row's padding so track fills full viewport width */
+  margin-inline: calc(-1 * var(--page-x));
 }
 
 .track {
@@ -20,7 +68,8 @@
   gap: var(--space-2);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding: var(--space-3) var(--page-x);
+  padding: var(--space-3) var(--page-x); /* re-establishes page-x so first card aligns with .title */
+  scroll-padding-left: var(--page-x);
   scrollbar-width: none;
 }
 
